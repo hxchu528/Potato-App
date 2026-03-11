@@ -83,9 +83,6 @@ h1{
 	</div>
 	<footer></footer>
 </body>
-<!--
-<script src = "https://cdn.sheetjs.com/xlsx-0.20.3/package/dist.xlsx.full.min.js"></script>
--->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 let out = document.getElementById("output");
@@ -114,7 +111,7 @@ function calculate(){
 function handleClick(){
 	out.innerHTML += "Predicted Nitrate: XXXX<br>";
 	/*
-    // In case of using ML in Python, use DJango? to send excel/csv data to ML.
+    // In case of using ML in Python, use DJango to send excel/csv data to ML.
 	fetch("/ML_Model/".{
 		method:"POST",
 		headers:{
@@ -146,4 +143,5 @@ function getCookie(name){
 }
 
 </script>
+
 </html>
