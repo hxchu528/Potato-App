@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<style>
+body{
+	height:100%;
+	margin:0px;
+}
+nav, footer{
+	background-color:#69131D;
+	height:5vh;
+}
+#hold{
+	background-color:white;
+	height:90vh;
+}
+h1{
+	background-color:white;
+	margin-top:0px;
+	margin-bottom:0px;
+	padding:5px;
+	text-align:center;
+}
+#form{
+	background-color:white;
+	padding: 5px;
+	display:table;
+	align-items: center;
+	margin-left:auto;
+	margin-right:auto;
+}
+#form div{
+	display:table-row;
+}
+#form label{
+	text-align:right;
+	padding-right:10px;
+	display:table-cell;
+}
+#form input,button,p{
+	margin-top:3px;
+	display:table-cell;
+}
+#form button{
+	align-items:center;
+}
+#output{
+	width:90%;
+	height:30%;
+	margin-left:auto;
+	margin-right:auto;
+	background-color:white;
+	border:1px solid;
+	margin-top:0px;
+	overflow-y:auto;
+	padding: 5px;
+	text-align:center;
+}
+</style>
+<body>
+	<nav></nav>
+	<div id = "hold">
+		<h1>Potato App</h1>
+		<!--Turn <div> into <form>-->
+		<form id = "form" enctype="multipart/form-data">
+			<div>
+			<label for = "weather">Weather file (Excel/CSV):</label>
+			<input type = "file" class = "upload" name = "weather">
+			</div>
+			<div>
+			<label for = "soil">Soil Properties (Excel/CSV):</label>
+			<input type = "file" class = "upload" name = "soil">
+			</div>
+			<div>
+			<label for = "threshold">Threshold Value:</label>
+			<input type = "textbox"name = "threshold">
+			</div>
+	        <div>
+			<p></p>
+			<button type="button" onclick = "handleClick()">Enter</button>
+			</div>
+		</form>
+		<!--
+		<div id = "form">
+			<div>
+            <label for = "weather">Weather file (Excel/CSV):</label>
+			<input type = "file" class = "upload" name = "weather">
+			</div>
+			<div>
+			<label for = "soil">Soil Properties (Excel/CSV):</label>
+			<input type = "file" class = "upload" name = "soil">
+			</div>
+			<div>
+			<label for = "threshold">Threshold Value:</label>
+			<input type = "textbox"name = "threshold">
+			</div>
+	        <div>
+			<p></p>
+			<button onclick = "handleClick()">Enter</button>
+			</div>
+		</div>
+		-->
+		<div id = "output">Output:<br></div>
+	</div>
+	<footer></footer>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let out = document.getElementById("output");
+let files = document.querySelectorAll(".upload");
+//files.forEach(val=>val.addEventListener("change",upload))
+let batch = {"weather":null,"soil":null}; // Data batches
+files[0].addEventListener("change",(e)=>{
+	//upload(e.target.files[0],batch["weather"])
+	batch["weather"] = e.target.files[0]||null;
+});
+files[1].addEventListener("change",(e)=>{
+	//upload(e.target.files[0],batch["soil"])
+	batch["soil"] = e.target.files[0]||null;
+});
+function upload(file,loc){
+	let reader = new FileReader();
+	reader.onload = function(e){
+		let data = new Uint8Array(e.target.result);
+		let workbook = XLSX.read(data,{type:'array'});
+		let name = workbook.SheetNames[0];
+		let worksheet = workbook.Sheets[name];
+		let jsonData = XLSX.utils.sheet_to_json(worksheet,{header:1});
+		loc = jsonData;
+	}
+	reader.readAsArrayBuffer(file);
+}
+
+function calculate(){
+	// TODO: Calculate any necessary data
+}
+
+function handleClick(){
+	//out.innerHTML = Object.entries(batch["weather"]).map(val=>val.join(": ")).join("<br>")+"<br><br>";
+	let input = document.getElementById("form");
+	let formData = new FormData(input);
+	fetch("/calculate/",{
+		method:"POST",
+		headers:{
+			"X-CSRFToken": getCookie("csrftoken")
+		},
+		body: formData
+	})
+	//out.innerHTML = batch["weather"];
+	//out.innerHTML += "Predicted Nitrate: XXXX<br>";
+}
+
+
+// DJango only
+function getCookie(name){
+	let cookieValue = null;
+	if(document.cookie && document.cookie!=''){
+		const cookies = document.cookie.split(";");
+		for(let cookie of cookies){
+			cookie = cookie.trim();
+			if(cookie.startsWith(name+'=')){
+				cookieValue = decodeURIComponent(cookie.slice(name.length+1));
+				break;
+			}
+		}
+	}
+	return cookieValue;
+}
+
+</script>
+
+</html>
