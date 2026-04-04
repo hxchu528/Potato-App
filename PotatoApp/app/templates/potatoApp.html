@@ -12,6 +12,7 @@ nav, footer{
 #hold{
 	background-color:white;
 	height:90vh;
+	overflow:auto;
 }
 h1{
 	background-color:white;
@@ -36,9 +37,12 @@ h1{
 	padding-right:10px;
 	display:table-cell;
 }
-#form input,button,p{
+#form input, p, button, select{
 	margin-top:3px;
 	display:table-cell;
+}
+#form p{
+	text-align:center;
 }
 #form button{
 	align-items:center;
@@ -60,82 +64,59 @@ h1{
 	<nav></nav>
 	<div id = "hold">
 		<h1>Potato App</h1>
-		<!--Turn <div> into <form>-->
 		<form id = "form" enctype="multipart/form-data">
 			<div>
-			<label for = "weather">Weather file (Excel/CSV):</label>
-			<input type = "file" class = "upload" name = "weather">
+				<label for = "weather">Weather file (Excel/CSV):</label>
+				<input type = "file" class = "upload" name = "weather">
 			</div>
 			<div>
-			<label for = "soil">Soil Properties (Excel/CSV):</label>
-			<input type = "file" class = "upload" name = "soil">
+				<label for = "planting_date">Planting Date:</label>
+				<input type = "date" name = "planting_date">
 			</div>
 			<div>
-			<label for = "threshold">Threshold Value:</label>
-			<input type = "textbox"name = "threshold">
+				<label for = "spad_date">SPAD Acquisition date:</label>
+				<input type = "date" name = "spad_date">
 			</div>
-	        <div>
-			<p></p>
-			<button type="button" onclick = "handleClick()">Enter</button>
+			<div>
+				<label for = "cultivar">Cultivar:</label>
+				<select name = "cultivar">
+					<option value = "None">--Select--</option>
+					<option value = "Alpine Russet">Alpine Russet</option>
+					<option value = "Clearwater">Clearwater</option>
+					<option value = "Dakota Russet">Dakota Russet</option>
+					<option value = "Easton">Easton</option>
+					<option value = "FL 1867">FL 1867</option>
+					<option value = "FL 2137">FL 2137</option>
+					<option value = "Hamlin">Hamlin</option>
+					<option value = "Ivory Russet">Ivory Russet</option>
+					<option value = "Lamoka">Lamoka</option>
+					<option value = "MN13142">MN13142</option>
+					<option value = "MN13142Cold">MN13142Cold</option>
+					<option value = "Red Norland">Red Norland</option>
+					<option value = "Russet Burbank">Russet Burbank</option>
+					<option value = "Umatilla">Umatilla</option>
+				</select>
+			</div>
+			<div>
+				<label for = "spad_value">SPAD Value:</label>
+				<input type = "number" name = "spad_value"></input>
+			</div>
+			<div>
+				<label for = "irrigation">Irrigation level (inch):</label>
+				<input type = "number" name = "irrigation"></input>
+			</div>
+			<div>
+				<p></p>
+				<button type="button" onclick = "handleClick()">Enter</button>
 			</div>
 		</form>
-		<!--
-		<div id = "form">
-			<div>
-            <label for = "weather">Weather file (Excel/CSV):</label>
-			<input type = "file" class = "upload" name = "weather">
-			</div>
-			<div>
-			<label for = "soil">Soil Properties (Excel/CSV):</label>
-			<input type = "file" class = "upload" name = "soil">
-			</div>
-			<div>
-			<label for = "threshold">Threshold Value:</label>
-			<input type = "textbox"name = "threshold">
-			</div>
-	        <div>
-			<p></p>
-			<button onclick = "handleClick()">Enter</button>
-			</div>
-		</div>
-		-->
 		<div id = "output">Output:<br></div>
 	</div>
 	<footer></footer>
 </body>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 let out = document.getElementById("output");
-let files = document.querySelectorAll(".upload");
-//files.forEach(val=>val.addEventListener("change",upload))
-let batch = {"weather":null,"soil":null}; // Data batches
-files[0].addEventListener("change",(e)=>{
-	//upload(e.target.files[0],batch["weather"])
-	batch["weather"] = e.target.files[0]||null;
-});
-files[1].addEventListener("change",(e)=>{
-	//upload(e.target.files[0],batch["soil"])
-	batch["soil"] = e.target.files[0]||null;
-});
-function upload(file,loc){
-	let reader = new FileReader();
-	reader.onload = function(e){
-		let data = new Uint8Array(e.target.result);
-		let workbook = XLSX.read(data,{type:'array'});
-		let name = workbook.SheetNames[0];
-		let worksheet = workbook.Sheets[name];
-		let jsonData = XLSX.utils.sheet_to_json(worksheet,{header:1});
-		loc = jsonData;
-	}
-	reader.readAsArrayBuffer(file);
-}
-
-function calculate(){
-	// TODO: Calculate any necessary data
-}
-
 function handleClick(){
-	//out.innerHTML = Object.entries(batch["weather"]).map(val=>val.join(": ")).join("<br>")+"<br><br>";
 	let input = document.getElementById("form");
 	let formData = new FormData(input);
 	fetch("/calculate/",{
@@ -144,9 +125,10 @@ function handleClick(){
 			"X-CSRFToken": getCookie("csrftoken")
 		},
 		body: formData
+	}).then(response=>response.json())
+	.then(data=>{
+		out.innerHTML = "Output:<br>" + data.message;
 	})
-	//out.innerHTML = batch["weather"];
-	//out.innerHTML += "Predicted Nitrate: XXXX<br>";
 }
 
 
