@@ -64,23 +64,24 @@ h1{
 	<nav></nav>
 	<div id = "hold">
 		<h1>Potato App</h1>
-		<form id = "form" enctype="multipart/form-data">
+		<form id = "form" enctype="multipart/form-data" method="POST">
+			{% csrf_token %}
 			<div>
 				<label for = "weather">Weather file (Excel/CSV):</label>
-				<input type = "file" class = "upload" name = "weather">
+				<input required type = "file" class = "upload" name = "weather" value="{{form.weather.value|default_if_none:''}}">
 			</div>
 			<div>
 				<label for = "planting_date">Planting Date:</label>
-				<input type = "date" name = "planting_date">
+				<input required type = "date" name = "planting_date" value="{{form.planting_date.value|default_if_none:''}}">
 			</div>
 			<div>
 				<label for = "spad_date">SPAD Acquisition date:</label>
-				<input type = "date" name = "spad_date">
+				<input required type = "date" name = "spad_date" value="{{form.spad_date.value|default_if_none:''}}">
 			</div>
 			<div>
 				<label for = "cultivar">Cultivar:</label>
-				<select name = "cultivar">
-					<option value = "None">--Select--</option>
+				<select required name = "cultivar" value="{{ form.cultivar.value|default_if_none:'' }}">
+					<option value = "">--Select--</option>
 					<option value = "Alpine Russet">Alpine Russet</option>
 					<option value = "Clearwater">Clearwater</option>
 					<option value = "Dakota Russet">Dakota Russet</option>
@@ -99,55 +100,20 @@ h1{
 			</div>
 			<div>
 				<label for = "spad_value">SPAD Value:</label>
-				<input type = "number" name = "spad_value"></input>
+				<input required type = "number" name = "spad_value" value="{{ form.spad_value.value|default_if_none:'' }}" placeholder="0.0"></input>
 			</div>
 			<div>
 				<label for = "irrigation">Irrigation level (inch):</label>
-				<input type = "number" name = "irrigation"></input>
+				<input type = "number" name = "irrigation" value="{{ form.irrigation.value|default_if_none:'' }}" placeholder="0"></input>
 			</div>
 			<div>
 				<p></p>
-				<button type="button" onclick = "handleClick()">Enter</button>
+				<button type="submit">Enter</button>
 			</div>
 		</form>
-		<div id = "output">Output:<br></div>
+		<div id = "output">Output:<br>{{ message }}</div>
 	</div>
 	<footer></footer>
 </body>
-<script>
-let out = document.getElementById("output");
-function handleClick(){
-	let input = document.getElementById("form");
-	let formData = new FormData(input);
-	fetch("/calculate/",{
-		method:"POST",
-		headers:{
-			"X-CSRFToken": getCookie("csrftoken")
-		},
-		body: formData
-	}).then(response=>response.json())
-	.then(data=>{
-		out.innerHTML = "Output:<br>" + data.message;
-	})
-}
-
-
-// DJango only
-function getCookie(name){
-	let cookieValue = null;
-	if(document.cookie && document.cookie!=''){
-		const cookies = document.cookie.split(";");
-		for(let cookie of cookies){
-			cookie = cookie.trim();
-			if(cookie.startsWith(name+'=')){
-				cookieValue = decodeURIComponent(cookie.slice(name.length+1));
-				break;
-			}
-		}
-	}
-	return cookieValue;
-}
-
-</script>
 
 </html>

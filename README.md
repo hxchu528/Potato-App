@@ -13,7 +13,7 @@ Location of the venv underlined in red.
 ![venv start](./img/venv_start.png)
 5. If this is your first time running the app, run ```pip install -r requirements.txt```. This may take a while to run. Otherwise skip this step if already done previously.
 ![downloading third party libraries](./img/pip_install.png)
-6. To start the server, move into the potatoApp directory and run ```python manage.py runserver```.
+6. To start the server, start at the repo root and run ```python PotatoApp/manage.py runserver```.
 ![run server](./img/server_start.png)
 7. Open up the url ```http://127.0.0.1:8000/app``` in your preferred browser. From here, you may use the app.
 8. Once you are done using the app, press ```Ctrl + C``` to stop the server. Then run ```deactivate``` from the terminal to stop the venv.
