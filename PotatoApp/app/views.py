@@ -139,7 +139,7 @@ def members(request):
         
         # Run ML model and return prediction
         prediction = ml_model(request.POST.get("cultivar"), accGDD, accMoist, float(request.POST.get("spad_value")))
-        return render(request, 'potatoApp.html', {"message": prediction.tolist(),"form": form})
+        return render(request, 'potatoApp.html', {"message": f"Predicted PetioleNO3: {prediction[0]:.2f}","form": form})
     else:
         form = Form()
     return render(request, 'potatoApp.html', {"form": form})
